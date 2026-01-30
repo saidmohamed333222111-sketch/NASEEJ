@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASEEJ | Modern Essentials</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #111; scroll-behavior: smooth; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sidebar { transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        html[dir="rtl"] .sidebar { transform: translateX(100%); }
+        .sidebar.open { transform: translateX(0); }
+        .selected-opt { background-color: #000 !important; color: #fff !important; border-color: #000 !important; }
+        .selected-color { ring: 2px; ring-color: #000; ring-offset: 2px; transform: scale(1.2); }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        .whatsapp-pulse { animation: pulse-green 2s infinite; }
+    </style>
+</head>
+<body class="overflow-x-hidden antialiased flex flex-col min-h-screen">
+
+    <nav class="sticky top-0 bg-white/95 backdrop-blur-md z-50 border-b border-gray-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-6">
+                    <button onclick="toggleSidebar()" class="text-2xl hover:text-gray-600 transition"><i class="fas fa-bars"></i></button>
+                    <button onclick="toggleLanguage()" class="text-sm font-bold border px-2 py-1 rounded hover:bg-black hover:text-white transition" id="lang-btn">عربي</button>
+                </div>
+                <div class="flex items-center gap-2 cursor-pointer" onclick="navigate('home')">
+                    <div class="w-8 h-8 bg-black text-white flex items-center justify-center font-bold text-lg rounded-sm">N</div> 
+                    <span class="text-2xl font-bold tracking-tighter uppercase">NASEEJ</span>
+                </div>
+                <div class="flex items-center gap-4 md:gap-6">
+                    <button onclick="handleUserIconClick()" class="text-xl hover:text-gray-600 transition flex items-center gap-2">
+                        <i class="far fa-user"></i>
+                        <span id="user-name-display" class="text-xs font-bold hidden md:block"></span>
+                    </button>
+                    <button onclick="navigate('wishlist')" class="text-xl hover:text-red-500 transition relative">
+                        <i class="far fa-heart"></i>
+                        <span id="wish-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                    </button>
+                    <button onclick="navigate('cart')" class="text-xl hover:text-gray-600 transition relative">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-black text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="sidebar" class="sidebar fixed inset-y-0 left-0 right-auto w-80 bg-white shadow-2xl z-[60] p-6 flex flex-col h-full rtl:left-auto rtl:right-0">
+        <div class="flex justify-between items-center mb-10">
+            <span class="font-bold text-xl tracking-widest" data-key="menu">MENU</span>
+            <button onclick="toggleSidebar()" class="text-2xl"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto space-y-2">
+            <button onclick="filterCategory('all')" class="block w-full text-left text-lg py-2 hover:pl-2 rtl:hover:pr-2 transition-all border-b border-gray-100" data-key="all_products">All Products</button>
+            <button onclick="filterCategory('men')" class="block w-full text-left text-lg py-2 hover:pl-2 rtl:hover:pr-2 transition-all border-b border-gray-100 font-semibold" data-key="men_col">Men's Collection</button>
+            <button onclick="filterCategory('women')" class="block w-full text-left text-lg py-2 hover:pl-2 rtl:hover:pr-2 transition-all border-b border-gray-100 font-semibold" data-key="women_col">Women's Collection</button>
+            <div class="pt-4 space-y-2 pl-4 rtl:pl-0 rtl:pr-4 text-gray-600 text-sm">
+                <button onclick="filterCategory('basic-tee')" class="block w-full text-left hover:text-black">Basic T-Shirts</button>
+                <button onclick="filterCategory('hoodie')" class="block w-full text-left hover:text-black">Hoodies</button>
+                <button onclick="filterCategory('winter')" class="block w-full text-left hover:text-black">Winter Gear</button>
+            </div>
+        </div>
+        <div class="pt-6 border-t border-gray-100 text-sm">
+            <button onclick="navigate('login')" class="block py-1 text-gray-400 hover:text-black" id="sidebar-login-btn" data-key="login_reg">Login / Register</button>
+            <button onclick="logout()" class="block py-1 text-red-500 hover:text-red-700 hidden" id="sidebar-logout-btn" data-key="logout">Logout</button>
+            <button onclick="navigate('support')" class="block py-1 text-gray-400 hover:text-black" data-key="help">Help & Support</button>
+        </div>
+    </div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-[55] hidden fade-in"></div>
+
+    <main id="app-container" class="flex-grow"></main>
+
+    <footer class="bg-white pt-20 pb-10 border-t border-gray-100 mt-20">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="w-8 h-8 bg-black text-white flex items-center justify-center font-bold text-lg rounded-sm">N</div>
+                        <span class="text-2xl font-bold tracking-tighter uppercase">NASEEJ</span>
+                    </div>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-6">Redefining modern essentials through quality craftsmanship and timeless design.</p>
+                    <div class="flex gap-4">
+                        <a href="https://instagram.com" target="_blank" class="w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all"><i class="fab fa-instagram"></i></a>
+                        <a href="https://facebook.com" target="_blank" class="w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://tiktok.com" target="_blank" class="w-10 h-10 border border-gray-200 rounded-full flex items-center justify-center hover:bg-black hover:text-white transition-all"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm uppercase mb-6 tracking-widest">Shop</h4>
+                    <ul class="space-y-4 text-sm text-gray-500">
+                        <li><button onclick="filterCategory('men')" class="hover:text-black transition">Men's Collection</button></li>
+                        <li><button onclick="filterCategory('women')" class="hover:text-black transition">Women's Collection</button></li>
+                        <li><button onclick="filterCategory('all')" class="hover:text-black transition">All Products</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm uppercase mb-6 tracking-widest">Company</h4>
+                    <ul class="space-y-4 text-sm text-gray-500">
+                        <li><button onclick="navigate('contact')" class="hover:text-black transition">Contact Us</button></li>
+                        <li><button onclick="navigate('support')" class="hover:text-black transition">FAQ</button></li>
+                        <li><button onclick="navigate('shipping')" class="hover:text-black transition">Shipping & Returns</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm uppercase mb-6 tracking-widest">Newsletter</h4>
+                    <p class="text-sm text-gray-500 mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
+                    <div class="flex gap-2">
+                        <input type="email" id="news-email" placeholder="email@example.com" class="flex-1 bg-gray-50 border-none p-3 text-sm focus:ring-1 focus:ring-black outline-none">
+                        <button onclick="subscribe()" class="bg-black text-white px-4 text-xs font-bold uppercase tracking-widest hover:bg-gray-800 transition">Join</button>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-gray-400">
+                <p>&copy; 2026 NASEEJ. All Rights Reserved.Made with ❤️ for you</p>
+                <div class="flex gap-6">
+                    <button onclick="navigate('terms')" class="hover:text-black transition">Privacy Policy</button>
+                    <button onclick="navigate('terms')" class="hover:text-black transition">Terms of Service</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/201020775664" target="_blank" class="fixed bottom-6 right-6 z-50 whatsapp-pulse bg-[#25D366] text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-lg hover:scale-110 transition duration-300">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        const products = [
+            { id: 1, name: "Premium Heavy Cotton Tee", price: 450, cat: "basic-tee", gender: "men", fit: "Oversize", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800", desc: "Heavyweight organic cotton. Designed for durability." },
+            { id: 2, name: "Women's High-Rise Legging", price: 550, cat: "leggings", gender: "women", fit: "Slim Fit", img: "https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=800", desc: "Buttery soft fabric with maximum stretch." },
+            { id: 3, name: "Essential Oversized Hoodie", price: 850, cat: "hoodie", gender: "men", fit: "Oversize", img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800", desc: "Fleece-lined warmth for winter days." },
+            { id: 4, name: "Winter Thermal Long Sleeve", price: 600, cat: "winter", gender: "women", fit: "Regular", img: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800", desc: "Keep warm without the bulk." },
+            { id: 5, name: "Classic Polo Basic", price: 500, cat: "basic-tee", gender: "men", fit: "Regular", img: "https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=800", desc: "Smart casual essential." },
+            { id: 6, name: "Cozy Sweatshirt", price: 700, cat: "hoodie", gender: "women", fit: "Oversize", img: "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=800", desc: "Perfect for lounging or going out." },
+            { id: 7, name: "Performance Legging Black", price: 550, cat: "leggings", gender: "women", fit: "Slim Fit", img: "https://images.unsplash.com/photo-1552160753-117159d4541c?w=800", desc: "Squat-proof and breathable." },
+            { id: 8, name: "Heavy Puffer Jacket", price: 1800, cat: "winter", gender: "men", fit: "Oversize", img: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800", desc: "Ultimate winter protection." },
+            { id: 9, name: "Relaxed Fit V-Neck", price: 400, cat: "basic-tee", gender: "women", fit: "Relaxed", img: "https://images.unsplash.com/photo-1541101767792-f9b2b1c4f127?w=800", desc: "Soft breathable v-neck tee." },
+            { id: 10, name: "Cotton Joggers", price: 650, cat: "men", gender: "men", fit: "Slim Fit", img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800", desc: "Premium comfort joggers." }
+        ];
+
+        const governorates = ["Cairo", "Giza", "Alexandria", "Dakahlia", "Red Sea", "Beheira", "Fayoum", "Gharbiya", "Ismailia", "Monufia", "Minya", "Qalyubia", "New Valley", "Suez", "Aswan", "Assiut", "Beni Suef", "Port Said", "Damietta", "Sharkia", "South Sinai", "Kafr Al Sheikh", "Matrouh", "Luxor", "Qena", "North Sinai", "Sohag"];
+        let cart = JSON.parse(localStorage.getItem('pb_cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('pb_wishlist')) || [];
+        let user = JSON.parse(localStorage.getItem('pb_user')) || null;
+        let currentView = 'home';
+        let prevView = 'home';
+        let currentParam = null;
+        let currentLang = 'en';
+        let appliedDiscount = 0;
+        let shippingFee = 70;
+
+        const strings = {
+            en: { shop_all: "Shop All", men: "Men", women: "Women", add_to_bag: "Add to Bag", login: "Login", register: "Register", order_summary: "Order Summary", checkout_btn: "ORDER", total: "Total", promo: "Promo Code", apply: "Apply", featured: "Featured Collections", select_size: "Select Size", select_color: "Select Color", back: "Back", your_bag: "Your Bag", empty_bag: "Your bag is empty", menu: "MENU", all_products: "All Products", men_col: "Men's Collection", women_col: "Women's Collection", login_reg: "Login / Register", logout: "Logout", help: "Help & Support", welcome: "Welcome" },
+            ar: { shop_all: "تسوق الكل", men: "رجالي", women: "حريمي", add_to_bag: "أضف للسلة", login: "دخول", register: "حساب جديد", order_summary: "ملخص الطلب", checkout_btn: "تأكيد الطلب", total: "الإجمالي", promo: "كود الخصم", apply: "تطبيق", featured: "مجموعات مميزة", select_size: "اختر المقاس", select_color: "اختر اللون", back: "عودة", your_bag: "حقيبة التسوق", empty_bag: "الحقيبة فارغة", menu: "القائمة", all_products: "كل المنتجات", men_col: "كولكشن رجالي", women_col: "كولكشن حريمي", login_reg: "دخول / تسجيل", logout: "خروج", help: "مساعدة", welcome: "أهلا" }
+        };
+
+        function t(key) { return strings[currentLang][key] || key; }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLang;
+            document.getElementById('lang-btn').innerText = currentLang === 'en' ? 'عربي' : 'English';
+            navigate(currentView, currentParam);
+            updateStaticText();
+        }
+
+        function updateStaticText() {
+            document.querySelectorAll('[data-key]').forEach(el => {
+                el.innerText = t(el.getAttribute('data-key'));
+            });
+        }
+
+        function navigate(viewName, param = null) {
+            const container = document.getElementById('app-container');
+            window.scrollTo(0,0);
+            prevView = currentView;
+            currentView = viewName;
+            currentParam = param;
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.add('hidden');
+            if (viewName === 'home') renderHome(container);
+            else if (viewName === 'product') renderProductPage(container, param);
+            else if (viewName === 'category') renderCategoryPage(container, param);
+            else if (viewName === 'cart') renderCartPage(container);
+            else if (viewName === 'wishlist') renderWishlistPage(container);
+            else if (viewName === 'login') renderLoginPage(container);
+            else if (viewName === 'register') renderRegisterPage(container);
+            else if (viewName === 'contact') renderContactPage(container);
+            else if (viewName === 'support') renderSupportPage(container);
+            else if (viewName === 'shipping') renderShippingPage(container);
+            else if (viewName === 'terms') renderTermsPage(container);
+            updateCounters();
+            updateUserUI();
+            updateStaticText();
+        }
+
+        function renderHome(container) {
+            container.innerHTML = `
+                <section class="relative h-[80vh] w-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                    <img src="https://i.postimg.cc/XNf6gGwm/Basics.jpg" class="absolute inset-0 w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/30"></div>
+                    <div class="relative z-10 text-center text-white fade-in">
+                        <h1 class="text-6xl md:text-8xl font-bold mb-4 uppercase">NASEEJ</h1>
+                        <p class="text-xl mb-8 font-light">Crafted for Comfort. Designed for Style.</p>
+                        <button onclick="filterCategory('all')" class="bg-white text-black px-12 py-4 font-bold uppercase tracking-widest hover:bg-black hover:text-white transition">${t('shop_all')}</button>
+                    </div>
+                </section>
+                <section class="py-16 px-4 max-w-7xl mx-auto">
+                    <h2 class="text-2xl font-bold text-center mb-10 uppercase tracking-widest">${t('featured')}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div onclick="filterCategory('men')" class="relative h-80 group cursor-pointer overflow-hidden rounded-sm">
+                            <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                            <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                <h3 class="text-white text-3xl font-bold uppercase border-b-2 border-white pb-1">${t('men')}</h3>
+                            </div>
+                        </div>
+                        <div onclick="filterCategory('women')" class="relative h-80 group cursor-pointer overflow-hidden rounded-sm">
+                            <img src="https://images.unsplash.com/photo-1605763240004-7b9a7acb4629?w=600" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                            <div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                <h3 class="text-white text-3xl font-bold uppercase border-b-2 border-white pb-1">${t('women')}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </section>`;
+        }
+
+        function renderCategoryPage(container, filter) {
+            let filtered = filter === 'all' ? products : (['men', 'women'].includes(filter) ? products.filter(p => p.gender === filter) : products.filter(p => p.cat === filter));
+            let h = `<div class="py-12 px-4 max-w-7xl mx-auto"><h2 class="text-3xl font-bold mb-8 uppercase text-center">${filter === 'all' ? t('all_products') : t(filter + '_col') || filter}</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-6">`;
+            filtered.forEach(p => {
+                const isWished = wishlist.some(w => w.id === p.id);
+                h += `
+                <div class="group relative">
+                    <div class="relative overflow-hidden bg-gray-100 aspect-[3/4] mb-3 cursor-pointer" onclick="navigate('product', ${p.id})">
+                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition">
+                        <span class="absolute bottom-2 left-2 rtl:left-auto rtl:right-2 bg-black/80 text-white text-[10px] uppercase font-bold px-2 py-1 rounded-sm backdrop-blur-sm z-10">${p.fit}</span>
+                    </div>
+                    <button onclick="toggleWishlist(${p.id}); event.stopPropagation();" class="absolute top-2 right-2 rtl:right-auto rtl:left-2 z-20 w-8 h-8 flex items-center justify-center bg-white/80 rounded-full hover:bg-white transition shadow-sm">
+                         <i class="${isWished ? 'fas text-red-500' : 'far'} fa-heart"></i>
+                    </button>
+                    <div onclick="navigate('product', ${p.id})" class="cursor-pointer">
+                        <h3 class="font-bold text-xs uppercase hover:underline">${p.name}</h3>
+                        <p class="text-gray-500 text-sm mt-1">${p.price} EGP</p>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = h + `</div></div>`;
+        }
+
+        function renderProductPage(container, id) {
+            const p = products.find(x => x.id === id);
+            const isWished = wishlist.some(w => w.id === p.id);
+            container.innerHTML = `
+                <div class="max-w-7xl mx-auto px-4 py-12 fade-in">
+                    <button onclick="navigate('${prevView}', '${currentParam}')" class="mb-6 text-sm text-gray-500 hover:text-black flex items-center gap-2">
+                        <i class="fas fa-arrow-${currentLang === 'ar' ? 'right' : 'left'}"></i> ${t('back')}
+                    </button>
+                    <div class="flex flex-col md:flex-row gap-12">
+                        <div class="w-full md:w-1/2 relative">
+                            <img src="${p.img}" class="w-full h-auto object-cover rounded-sm">
+                            <span class="absolute top-4 left-4 bg-black text-white px-3 py-1 text-sm font-bold uppercase">${p.fit}</span>
+                        </div>
+                        <div class="w-full md:w-1/2 space-y-8">
+                            <div><h1 class="text-4xl font-bold uppercase mb-2">${p.name}</h1><p class="text-2xl font-medium">${p.price} EGP</p><p class="text-gray-500 mt-4 leading-relaxed">${p.desc}</p></div>
+                            <div class="border-t border-b py-6 space-y-6">
+                                <div><span class="block text-xs font-bold uppercase mb-2">${t('select_size')}</span><div class="flex gap-3" id="size-box">${['M', 'L', 'XL', 'XXL'].map(s => `<button class="w-12 h-12 border flex items-center justify-center hover:border-black transition" onclick="sel(this, 'size')">${s}</button>`).join('')}</div></div>
+                                <div><span class="block text-xs font-bold uppercase mb-2">${t('select_color')}</span><div class="flex gap-3"><div class="w-8 h-8 rounded-full bg-black cursor-pointer border" onclick="selColor(this, 'Black')"></div><div class="w-8 h-8 rounded-full bg-white border cursor-pointer" onclick="selColor(this, 'White')"></div></div></div>
+                            </div>
+                            <div class="flex gap-4"><button onclick="addToCart(${p.id})" class="flex-1 bg-black text-white py-4 font-bold uppercase tracking-widest hover:bg-gray-800 transition">${t('add_to_bag')}</button><button onclick="toggleWishlist(${p.id})" class="w-14 border flex items-center justify-center"><i class="${isWished ? 'fas text-red-500' : 'far'} fa-heart text-xl"></i></button></div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function renderCartPage(container) {
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let finalTotal = total + shippingFee - appliedDiscount;
+            
+            let html = `<div class="max-w-7xl mx-auto px-4 py-12 fade-in"><h1 class="text-3xl font-bold mb-8 uppercase">${t('your_bag')}</h1><div class="flex flex-col lg:flex-row gap-12"><div class="w-full lg:w-2/3 space-y-6">`;
+            
+            if (cart.length === 0) html += `<p class="text-center text-gray-500 py-20">${t('empty_bag')}.</p>`;
+            else cart.forEach((item, index) => {
+                html += `<div class="flex gap-4 border-b pb-6">
+                    <img src="${item.img}" class="w-24 h-32 object-cover cursor-pointer" onclick="navigate('product', ${item.id})">
+                    <div class="flex-1"><h3 class="font-bold uppercase cursor-pointer" onclick="navigate('product', ${item.id})">${item.name}</h3><p class="text-xs text-gray-500 uppercase mt-1">Size: ${item.size || '-'} / Color: ${item.color || '-'}</p><p class="text-sm font-bold mt-2">${item.price} EGP</p><button onclick="removeFromCart(${index})" class="text-xs text-red-500 underline mt-4">Remove</button></div>
+                </div>`;
+            });
+
+            html += `</div><div class="w-full lg:w-1/3 bg-gray-50 p-8 rounded-sm shadow-sm border border-gray-100 sticky top-24">
+                <h3 class="font-bold mb-8 uppercase tracking-widest text-lg">${t('order_summary')}</h3>
+                <div class="space-y-4 mb-8">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="fname" name="fname" autocomplete="given-name" placeholder="First Name" class="w-full p-4 text-sm border-gray-200 border bg-white focus:ring-1 focus:ring-black outline-none transition">
+                        <input type="text" id="lname" name="lname" autocomplete="family-name" placeholder="Last Name" class="w-full p-4 text-sm border-gray-200 border bg-white focus:ring-1 focus:ring-black outline-none transition">
+                    </div>
+                    <input type="email" id="c-email" name="email" autocomplete="email" placeholder="Email Address" value="${user ? user.email : ''}" class="w-full p-4 text-sm border-gray-200 border bg-white focus:ring-1 focus:ring-black outline-none transition">
+                    <input type="tel" id="c-phone" name="phone" autocomplete="tel" placeholder="WhatsApp Number" class="w-full p-4 text-sm border-gray-200 border bg-white focus:ring-1 focus:ring-black outline-none transition">
+                    <select id="c-gov" name="gov" autocomplete="address-level1" class="w-full p-4 text-sm border-gray-200 border bg-white focus:ring-1 focus:ring-black outline-none transition">${governorates.map(g => `<option value="${g}">${g}</option>`).join('')}</select>
+                    <input type="text" id="c-addr" name="address" autocomplete="street-address" placeholder="Detailed Shipping Address" class="w-full p-4 text-sm border-gray-200 border bg-white focus:ring-1 focus:ring-black outline-none transition">
+                    <div class="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                        <input type="text" id="promo-code" placeholder="${t('promo')}" class="flex-1 p-4 text-sm border-gray-200 border bg-white focus:ring-1 focus:ring-black outline-none uppercase">
+                        <button onclick="applyPromo(${total})" class="bg-gray-200 px-6 text-xs font-bold uppercase hover:bg-black hover:text-white transition-all">${t('apply')}</button>
+                    </div>
+                </div>
+                <div class="space-y-3 mb-8 border-t border-gray-100 pt-6">
+                    <div class="flex justify-between text-gray-500 text-sm"><span>Subtotal</span><span>${total} EGP</span></div>
+                    <div class="flex justify-between text-gray-500 text-sm"><span>Shipping</span><span class="text-black font-bold text-[12px]">${shippingFee} EGP</span></div>
+                    ${appliedDiscount > 0 ? `<div class="flex justify-between text-gray-500 text-sm"><span>Discount</span><span class="text-red-500">-${appliedDiscount} EGP</span></div>` : ''}
+                    <div class="flex justify-between font-bold text-xl pt-2 border-t border-gray-100 mt-2"><span>${t('total')}</span><span>${finalTotal} EGP</span></div>
+                </div>
+                <button onclick="checkout()" class="w-full bg-[#9ca3af] text-white py-5 font-bold uppercase flex items-center justify-center gap-3 hover:bg-[#000000] transition-all shadow-lg transform hover:-translate-y-1">
+                    <i class="fab fa-black text-xl"></i> ${t('checkout_btn')}
+                </button>
+                <p class="text-[10px] text-gray-400 text-center mt-4 uppercase tracking-tighter">Secure checkout via WhatsApp Business</p>
+            </div></div></div>`;
+            container.innerHTML = html;
+        }
+
+        function applyPromo(subtotal) { 
+            const code = document.getElementById('promo-code').value.toUpperCase();
+            if(code === "NASEEJ10") {
+                appliedDiscount = subtotal * 0.10;
+                alert('Promo code applied! 10% Discount.');
+                renderCartPage(document.getElementById('app-container'));
+            } else {
+                alert('Invalid Promo Code');
+                appliedDiscount = 0;
+            }
+        }
+
+        function renderLoginPage(container) {
+            container.innerHTML = `<div class="max-w-md mx-auto px-4 py-20 fade-in text-center">
+                <h1 class="text-3xl font-bold mb-8 uppercase">${t('login')}</h1>
+                <div class="space-y-4">
+                    <input type="email" id="login-email" name="email" autocomplete="email" placeholder="Email" class="w-full p-4 border outline-none">
+                    <input type="password" name="password" autocomplete="current-password" placeholder="Password" class="w-full p-4 border outline-none">
+                    <button onclick="performLogin()" class="w-full bg-black text-white py-4 font-bold uppercase">Sign In</button>
+                    <p class="text-sm text-gray-500">New here? <button onclick="navigate('register')" class="text-black font-bold underline">${t('register')}</button></p>
+                </div>
+            </div>`;
+        }
+
+        function renderRegisterPage(container) {
+            container.innerHTML = `<div class="max-w-md mx-auto px-4 py-20 fade-in text-center">
+                <h1 class="text-3xl font-bold mb-8 uppercase">${t('register')}</h1>
+                <div class="space-y-4">
+                    <input type="text" id="reg-name" name="name" autocomplete="name" placeholder="Full Name" class="w-full p-4 border outline-none">
+                    <input type="email" id="reg-email" name="email" autocomplete="email" placeholder="Email" class="w-full p-4 border outline-none">
+                    <input type="password" name="new-password" autocomplete="new-password" placeholder="Password" class="w-full p-4 border outline-none">
+                    <button onclick="performRegister()" class="w-full bg-black text-white py-4 font-bold uppercase">Create Account</button>
+                    <p class="text-sm text-gray-500">Already a member? <button onclick="navigate('login')" class="text-black font-bold underline">${t('login')}</button></p>
+                </div>
+            </div>`;
+        }
+
+        function subscribe() {
+            const email = document.getElementById('news-email').value;
+            if(email) {
+                alert("Thanks for subscribing to our newsletter!");
+                document.getElementById('news-email').value = '';
+            } else {
+                alert("Please enter a valid email address.");
+            }
+        }
+
+        let selData = {size: null, color: null};
+        function sel(btn, type) { Array.from(btn.parentElement.children).forEach(c => c.classList.remove('selected-opt')); btn.classList.add('selected-opt'); selData[type] = btn.innerText; }
+        function selColor(div, c) { Array.from(div.parentElement.children).forEach(el => el.classList.remove('selected-color')); div.classList.add('selected-color'); selData.color = c; }
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('hidden'); }
+        function filterCategory(c) { navigate('category', c); }
+        function addToCart(id) {
+            const p = products.find(x => x.id === id);
+            cart.push({...p, ...selData, uid: Date.now()});
+            localStorage.setItem('pb_cart', JSON.stringify(cart));
+            navigate('cart');
+        }
+        function toggleWishlist(id) {
+            const idx = wishlist.findIndex(x => x.id === id);
+            if (idx > -1) wishlist.splice(idx, 1);
+            else wishlist.push(products.find(x => x.id === id));
+            localStorage.setItem('pb_wishlist', JSON.stringify(wishlist));
+            const container = document.getElementById('app-container');
+            if(currentView === 'wishlist') renderWishlistPage(container);
+            else if(currentView === 'category') renderCategoryPage(container, currentParam);
+            else if(currentView === 'product') renderProductPage(container, id);
+            updateCounters();
+        }
+        function removeFromCart(i) { cart.splice(i,1); localStorage.setItem('pb_cart', JSON.stringify(cart)); renderCartPage(document.getElementById('app-container')); updateCounters(); }
+        function updateCounters() {
+            const cc = document.getElementById('cart-count');
+            const wc = document.getElementById('wish-count');
+            if(cart.length > 0) { cc.innerText = cart.length; cc.classList.remove('hidden'); } else cc.classList.add('hidden');
+            if(wishlist.length > 0) { wc.innerText = wishlist.length; wc.classList.remove('hidden'); } else wc.classList.add('hidden');
+        }
+
+        function checkout() {
+            const fname = document.getElementById('fname').value;
+            const lname = document.getElementById('lname').value;
+            const email = document.getElementById('c-email').value;
+            const phone = document.getElementById('c-phone').value;
+            const addr = document.getElementById('c-addr').value;
+            const gov = document.getElementById('c-gov').value;
+            const promo = document.getElementById('promo-code').value;
+
+            if(!fname || !phone || !email || !addr) return alert("Please fill all required fields!");
+
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            let finalTotal = total + shippingFee - appliedDiscount;
+
+            let msg = `*New Order - NASEEJ*%0A`;
+            msg += `Name: ${fname} ${lname}%0A`;
+            msg += `Phone: ${phone}%0AEmail: ${email}%0AGov: ${gov}%0AAddress: ${addr}%0APromo: ${promo}%0A%0A`;
+            msg += `*Items:*%0A`;
+            cart.forEach(i => msg += `- ${i.name} [${i.size || 'N/A'}, ${i.color || 'N/A'}] (${i.price} EGP)%0A`);
+            msg += `%0A*Subtotal:* ${total} EGP`;
+            msg += `%0A*Shipping:* ${shippingFee} EGP`;
+            msg += `%0A*Discount:* ${appliedDiscount} EGP`;
+            msg += `%0A*TOTAL: ${finalTotal} EGP*`;
+
+            let emailSubject = `Order Confirmation - NASEEJ`;
+            let emailBody = `Hi ${fname},\n\nThank you for your order!\n\nDetails:\n`;
+            cart.forEach(i => emailBody += `- ${i.name} [Size: ${i.size}, Color: ${i.color}] (${i.price} EGP)\n`);
+            emailBody += `\nSubtotal: ${total} EGP\nShipping: ${shippingFee} EGP\nDiscount: ${appliedDiscount} EGP\nTotal Paid: ${finalTotal} EGP\nAddress: ${addr}, ${gov}\n\nWe will process your order shortly!`;
+            
+            window.open(`mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`);
+
+            setTimeout(() => {
+                window.open(`https://wa.me/201020775664?text=${msg}`);
+            }, 500);
+        }
+
+        function performLogin() {
+            const email = document.getElementById('login-email').value;
+            if(!email) return alert("Enter email");
+            user = { name: email.split('@')[0], email: email };
+            localStorage.setItem('pb_user', JSON.stringify(user));
+            navigate('home');
+        }
+        function performRegister() {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            if(!name || !email) return alert("Enter details");
+            user = { name: name, email: email };
+            localStorage.setItem('pb_user', JSON.stringify(user));
+            navigate('home');
+        }
+        function logout() { localStorage.removeItem('pb_user'); user = null; navigate('home'); }
+        function updateUserUI() {
+            const nameDisplay = document.getElementById('user-name-display');
+            const sbLogin = document.getElementById('sidebar-login-btn');
+            const sbLogout = document.getElementById('sidebar-logout-btn');
+            if(user) { nameDisplay.innerText = `Hi, ${user.name}`; sbLogin.classList.add('hidden'); sbLogout.classList.remove('hidden'); }
+            else { nameDisplay.innerText = ""; sbLogin.classList.remove('hidden'); sbLogout.classList.add('hidden'); }
+        }
+        function handleUserIconClick() { if(user) alert("You are already logged in as " + user.name); else navigate('login'); }
+        function renderContactPage(c) { c.innerHTML = `<div class="max-w-4xl mx-auto px-4 py-16 fade-in text-center"><h1 class="text-4xl font-bold mb-8 uppercase">Contact Us</h1><p class="text-gray-500 mb-8">We are here to help you 24/7.</p><div class="grid md:grid-cols-2 gap-8 text-left"><div class="bg-gray-50 p-8"><h3 class="font-bold uppercase mb-4">Support Email</h3><p class="text-gray-600">support@naseej.com</p></div><div class="bg-gray-50 p-8"><h3 class="font-bold uppercase mb-4">Official WhatsApp</h3><p class="text-gray-600">+201020775664</p></div></div></div>`; }
+        function renderSupportPage(c) { c.innerHTML = `<div class="max-w-4xl mx-auto px-4 py-16 fade-in"><h1 class="text-4xl font-bold mb-8 uppercase text-center">Help Center</h1><div class="space-y-6"><details class="group border-b pb-4 cursor-pointer"><summary class="font-bold uppercase">Shipping Times?</summary><p class="mt-2 text-gray-500">3-5 days inside Egypt.</p></details><details class="group border-b pb-4 cursor-pointer"><summary class="font-bold uppercase">Exchange Policy?</summary><p class="mt-2 text-gray-500">14-day free exchange for any defect.</p></details></div></div>`; }
+        function renderShippingPage(c) { c.innerHTML = `<div class="p-20 text-center"><h1>Shipping & Returns Content</h1></div>`; }
+        function renderTermsPage(c) { c.innerHTML = `<div class="p-20 text-center"><h1>Terms Content</h1></div>`; }
+        function renderWishlistPage(container) {
+            if (wishlist.length === 0) { container.innerHTML = `<div class="p-20 text-center uppercase text-gray-500"><h1 class="text-2xl font-bold mb-4">Your Wishlist is Empty</h1><button onclick="navigate('home')" class="underline">Start Shopping</button></div>`; return; }
+            let h = `<div class="py-12 px-4 max-w-7xl mx-auto"><h2 class="text-3xl font-bold mb-8 uppercase text-center">My Wishlist</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-6">`;
+            wishlist.forEach(p => { h += `<div class="group relative"><div class="relative overflow-hidden bg-gray-100 aspect-[3/4] mb-3 cursor-pointer" onclick="navigate('product', ${p.id})"><img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition"><span class="absolute bottom-2 left-2 bg-black/80 text-white text-[10px] uppercase font-bold px-2 py-1 rounded-sm">${p.fit}</span></div><button onclick="toggleWishlist(${p.id})" class="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-white/80 rounded-full hover:bg-white transition shadow-sm"><i class="fas fa-trash text-red-500"></i></button><div onclick="navigate('product', ${p.id})" class="cursor-pointer"><h3 class="font-bold text-xs uppercase hover:underline">${p.name}</h3><p class="text-gray-500 text-sm mt-1">${p.price} EGP</p></div></div>`; });
+            container.innerHTML = h + `</div></div>`;
+        }
+
+        window.onload = () => { if(user) updateUserUI(); navigate('home'); };
+    </script>
+</body>
+</html>
