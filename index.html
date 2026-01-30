@@ -326,10 +326,10 @@
                     ${appliedDiscount > 0 ? `<div class="flex justify-between text-gray-500 text-sm"><span>Discount</span><span class="text-red-500">-${appliedDiscount} EGP</span></div>` : ''}
                     <div class="flex justify-between font-bold text-xl pt-2 border-t border-gray-100 mt-2"><span>${t('total')}</span><span>${finalTotal} EGP</span></div>
                 </div>
-                <button onclick="checkout()" class="w-full bg-[#25D366] text-white py-5 font-bold uppercase flex items-center justify-center gap-3 hover:bg-[#128C7E] transition-all shadow-lg transform hover:-translate-y-1">
-                    <i class="fab fa-whatsapp text-xl"></i> ${t('checkout_btn')}
+                <button onclick="checkout()" class="w-full bg-[#9ca3af] text-white py-5 font-bold uppercase flex items-center justify-center gap-3 hover:bg-[#000000] transition-all shadow-lg transform hover:-translate-y-1">
+                    <i class="fab fa- text-xl"></i> ${t('checkout_btn')}
                 </button>
-                <p class="text-[10px] text-gray-400 text-center mt-4 uppercase tracking-tighter">Secure checkout via WhatsApp Business</p>
+                <p class="text-[10px] text-gray-400 text-center mt-4 uppercase tracking-tighter">Your order confirmation will be sent to your email address</p>
             </div></div></div>`;
             container.innerHTML = html;
         }
@@ -507,3 +507,4 @@
     </script>
 </body>
 </html>
+
