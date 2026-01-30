@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NASEEJ | Modern Essentials</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("oZrDdVqmiz6AF8v7P");
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -121,7 +127,7 @@
                 </div>
             </div>
             <div class="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-medium uppercase tracking-widest text-gray-400">
-                <p>&copy; 2026 NASEEJ. All Rights Reserved.Made with ❤️ for you</p>
+                <p>&copy; 2026 NASEEJ. All Rights Reserved. Made with ❤️ for you</p>
                 <div class="flex gap-6">
                     <button onclick="navigate('terms')" class="hover:text-black transition">Privacy Policy</button>
                     <button onclick="navigate('terms')" class="hover:text-black transition">Terms of Service</button>
@@ -290,6 +296,7 @@
             let html = `<div class="max-w-7xl mx-auto px-4 py-12 fade-in"><h1 class="text-3xl font-bold mb-8 uppercase">${t('your_bag')}</h1><div class="flex flex-col lg:flex-row gap-12"><div class="w-full lg:w-2/3 space-y-6">`;
             
             if (cart.length === 0) html += `<p class="text-center text-gray-500 py-20">${t('empty_bag')}.</p>`;
+ 
             else cart.forEach((item, index) => {
                 html += `<div class="flex gap-4 border-b pb-6">
                     <img src="${item.img}" class="w-24 h-32 object-cover cursor-pointer" onclick="navigate('product', ${item.id})">
@@ -319,8 +326,8 @@
                     ${appliedDiscount > 0 ? `<div class="flex justify-between text-gray-500 text-sm"><span>Discount</span><span class="text-red-500">-${appliedDiscount} EGP</span></div>` : ''}
                     <div class="flex justify-between font-bold text-xl pt-2 border-t border-gray-100 mt-2"><span>${t('total')}</span><span>${finalTotal} EGP</span></div>
                 </div>
-                <button onclick="checkout()" class="w-full bg-[#9ca3af] text-white py-5 font-bold uppercase flex items-center justify-center gap-3 hover:bg-[#000000] transition-all shadow-lg transform hover:-translate-y-1">
-                    <i class="fab fa-black text-xl"></i> ${t('checkout_btn')}
+                <button onclick="checkout()" class="w-full bg-[#25D366] text-white py-5 font-bold uppercase flex items-center justify-center gap-3 hover:bg-[#128C7E] transition-all shadow-lg transform hover:-translate-y-1">
+                    <i class="fab fa-whatsapp text-xl"></i> ${t('checkout_btn')}
                 </button>
                 <p class="text-[10px] text-gray-400 text-center mt-4 uppercase tracking-tighter">Secure checkout via WhatsApp Business</p>
             </div></div></div>`;
@@ -414,30 +421,51 @@
             const promo = document.getElementById('promo-code').value;
 
             if(!fname || !phone || !email || !addr) return alert("Please fill all required fields!");
-
             let total = cart.reduce((sum, item) => sum + item.price, 0);
             let finalTotal = total + shippingFee - appliedDiscount;
-
-            let msg = `*New Order - NASEEJ*%0A`;
-            msg += `Name: ${fname} ${lname}%0A`;
-            msg += `Phone: ${phone}%0AEmail: ${email}%0AGov: ${gov}%0AAddress: ${addr}%0APromo: ${promo}%0A%0A`;
-            msg += `*Items:*%0A`;
-            cart.forEach(i => msg += `- ${i.name} [${i.size || 'N/A'}, ${i.color || 'N/A'}] (${i.price} EGP)%0A`);
-            msg += `%0A*Subtotal:* ${total} EGP`;
-            msg += `%0A*Shipping:* ${shippingFee} EGP`;
-            msg += `%0A*Discount:* ${appliedDiscount} EGP`;
-            msg += `%0A*TOTAL: ${finalTotal} EGP*`;
-
-            let emailSubject = `Order Confirmation - NASEEJ`;
-            let emailBody = `Hi ${fname},\n\nThank you for your order!\n\nDetails:\n`;
-            cart.forEach(i => emailBody += `- ${i.name} [Size: ${i.size}, Color: ${i.color}] (${i.price} EGP)\n`);
-            emailBody += `\nSubtotal: ${total} EGP\nShipping: ${shippingFee} EGP\nDiscount: ${appliedDiscount} EGP\nTotal Paid: ${finalTotal} EGP\nAddress: ${addr}, ${gov}\n\nWe will process your order shortly!`;
             
-            window.open(`mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`);
+            // بداية التعديل: إنشاء كود HTML للصور والمنتجات
+            let detailsHtml = `<div style="font-family: Arial, sans-serif; width: 100%;">`;
+            cart.forEach(item => {
+                detailsHtml += `
+                <div style="border-bottom: 1px solid #eee; padding: 10px 0; display: flex; align-items: center;">
+                    <img src="${item.img}" style="width: 80px; height: 100px; object-fit: cover; margin-right: 15px; border-radius: 4px;">
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; text-transform: uppercase;">${item.name}</h4>
+                        <p style="margin: 0; font-size: 14px;">Price: <b>${item.price} EGP</b></p>
+                        <p style="margin: 0; font-size: 12px; color: #666;">Size: ${item.size || '-'} | Color: ${item.color || '-'}</p>
+                    </div>
+                </div>`;
+            });
+            detailsHtml += `</div>`;
+            // نهاية كود HTML
 
-            setTimeout(() => {
-                window.open(`https://wa.me/201020775664?text=${msg}`);
-            }, 500);
+            const templateParams = {
+                to_name: fname + " " + lname,
+                user_email: email, 
+                order_details: detailsHtml, // هنا بنبعت كود الصور
+                subtotal: total + " EGP",
+                shipping: shippingFee + " EGP",
+                discount: appliedDiscount + " EGP",
+                total_price: finalTotal + " EGP",
+                address: addr + ", " + gov,
+                phone: phone,
+                promo: promo
+            };
+
+            emailjs.send('service_l0748ww', 'template_79t7mju', templateParams)
+                .then(function(response) {
+                   console.log('SUCCESS!', response.status, response.text);
+                   alert("Order Placed! Check your email for details."); // رسالة تأكيد بسيطة
+                   cart = []; // تفريغ السلة
+                   localStorage.setItem('pb_cart', JSON.stringify(cart));
+                   navigate('home');
+                }, function(error) {
+                   console.log('FAILED...', error);
+                   alert("Order Failed. Please try again.");
+                });
+                
+            // تم حذف كود الواتساب (window.open) نهائياً من هنا بناءً على طلبك
         }
 
         function performLogin() {
